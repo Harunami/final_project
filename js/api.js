@@ -12,6 +12,7 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
+console.log(firebase);
 
 // Create the script tag, set the appropriate attributes
 var script = document.createElement('script');

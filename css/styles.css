@@ -89,6 +89,27 @@ body {
 	top:1px;
 }
 
+.button4 {
+	background:#e6e6e6;
+	border:1px transparent;
+	display:inline-grid;
+	cursor:pointer;
+	color:black;
+	font-size:36px;
+	text-decoration:none;
+    transform: translate(-20px, -60px);
+    float: right;
+}
+.button4:hover {
+	background:linear-gradient(to bottom, #f6f6f6 5%, #ffffff 100%);
+	background-color:#f6f6f6;
+}
+.button4:active {
+	position:relative;
+    color: gold;
+	top:1px;
+}
+
 .resultstab {
     height: 115px;
     background: #e6e6e6;

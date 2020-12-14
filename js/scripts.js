@@ -1,3 +1,5 @@
+var database = firebase.database();
+var cProfile;
 var searchByLocation = false;
 
 //TODO: AUXILIARY FUNCTIONS
@@ -138,6 +140,26 @@ function getData(myurl) {
                     
                     locbtn.onclick = function() {displayMap(lat, lon);}
                     
+                    //favorites button
+                    let favbtn = document.createElement('button');
+                    favbtn.setAttribute("class","button4");
+                    favbtn.setAttribute("type","submit");
+                    favbtn.innerHTML = '\u2606';
+                    resulttab.append(favbtn);
+                    
+                    var refChild = database.ref("user/" + cProfile.uid + "/" + id);
+                        refChild.once("value", snapshot => {
+                            if(snapshot.exists())
+                                {
+                                    favbtn.innerHTML = '\u2605';
+                                    favbtn.onclick = function() { unfavorite(favbtn, id);}
+                                }
+                            else{
+                                    favbtn.onclick = function() { favorite(favbtn, id);}
+
+                            }
+                        });
+                    
                     //append entire workspace after every div is made
                     workspace.append(resulttab);
                     
@@ -147,6 +169,12 @@ function getData(myurl) {
             
             else
             {
+                var workspace = document.getElementById("results");
+                var resulttab = document.createElement('div');
+                var nofound = document.createElement('p');
+                nofound.append("No results found.");
+                resulttab.append(nofound);
+                workspace.append(resulttab);
                 
             }
             
@@ -164,15 +192,13 @@ function generalSearch() {
     if(term.length != 0 && location.length != 0) //if both input fields have value, create URL and send to getData()
     {
         console.log(term + " " + location);
-        var myurl = "https://cors-anywhere.herokuapp.com/https://api.yelp.com/v3/businesses/search?term=" + term + "&location=" + location;
+        
+        var myurl = "https://aqueous-shore-68728.herokuapp.com/https://api.yelp.com/v3/businesses/search?term=" + term + "&location=" + location;
         getData(myurl);
     }
     else if(term.length != 0 && searchByLocation) //if the Use My Location box is checked off
     {
-        
-        console.log("Searching by location");
-        
-        gpsSearch();
+        gpsSearch(term);
     }
     else //else if nothing in either input fields
     {
@@ -181,8 +207,24 @@ function generalSearch() {
     
 }
 
-function gpsSearch() {
+function gpsSearch(term) {
     
+    console.log("Searching by location");
+    
+        
+    position = navigator.geolocation.getCurrentPosition(function onSuccess(position){
+            
+        var lat = position.coords.latitude;
+        var long = position.coords.longitude;
+        var myurl = "https://aqueous-shore-68728.herokuapp.com/https://api.yelp.com/v3/businesses/search?term=" + term + "&latitude=" + lat + "&longitude=" + long;
+            
+            
+        //functionality here
+        getData(myurl);
+                                  
+
+    },function onerror(){},{maximumAge:10000, timeout:5000, enableHighAccuracy: true});
+               
 }
 
 
@@ -225,9 +267,13 @@ firebase.auth().onAuthStateChanged(function(user) {
       document.getElementById("userdiv").style.display = "block";
       changeBackground("white");
       
-      var user = firebase.auth().currentUser;
+      user = firebase.auth().currentUser;
+      cProfile = firebase.auth().currentUser;
+      
+      console.log(user.uid);
+      refreshFavorites();
 
-      document.getElementById("puser").innerHTML = "User : " + user.email;
+      document.getElementById("puser").innerHTML = "User : " + user.email + " " + user.uid;
       display_profile();
       
   } else {
@@ -239,6 +285,39 @@ firebase.auth().onAuthStateChanged(function(user) {
   }
 });
 
+
+//TODO: FIREBASE REALTIME DATABASE
+function favorite(favbtn, id) {
+    favbtn.innerHTML = '\u2605';
+    console.log("Favorited business ID: " + id + " for user " + cProfile.uid);
+    favbtn.onclick = function() { unfavorite(favbtn, id); }
+    
+    var ref = database.ref("user/" + cProfile.uid);
+    ref.child(id).set(true);
+    
+    refreshFavorites();
+}
+
+function unfavorite(favbtn, id) {
+    favbtn.innerHTML = '\u2606';
+    console.log("Unfavorited business ID: " + id + " for user " + cProfile.uid); 
+    favbtn.onclick = function() { favorite(favbtn, id); }
+    
+    var ref = database.ref("user/" + cProfile.uid + "/" + id);
+    ref.remove();
+    
+    refreshFavorites();
+}
+
+function refreshFavorites() {
+    var ref = database.ref("user/" + cProfile.uid);
+    
+    ref.once("value", snapshot => {
+            var key = Object.keys(snapshot.val());
+            console.log(key.length);
+    })
+    
+}
 
 
 //TODO: DISPLAY FUNCTIONS
