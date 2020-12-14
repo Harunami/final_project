@@ -260,6 +260,25 @@ function logout() {
     });
 }
 
+function signup() {
+    
+    var email = document.getElementById("signup_email").value;
+    var password = document.getElementById("signup_password").value;
+    
+    firebase.auth().createUserWithEmailAndPassword(email, password).then((user) => {
+        // Signed in 
+        // ...
+        var modal = document.getElementById("signupModal");
+        modal.style.display = "none";
+        
+      })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // ..
+      });
+}
+
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     // User is signed in.
@@ -282,6 +301,8 @@ firebase.auth().onAuthStateChanged(function(user) {
       document.getElementById("logindiv").style.display = "block";
       document.getElementById("userdiv").style.display = "none";
       changeBackground("#da1500");
+      
+      refreshDisplay();
       
   }
 });

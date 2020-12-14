@@ -8,6 +8,10 @@ body {
     overflow-x: hidden;
 }
 
+.signup-content {
+    margin-top: 270px;
+}
+
 .login-screen {
     width: 40%;
     margin: 0px auto;
@@ -31,7 +35,7 @@ body {
 .login-screen p {
     text-align: center;
     color: white;
-    transform: translate(0px, 30px);
+    transform: translate(5px, 30px);
 }
 
 .login-screen img {

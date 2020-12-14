@@ -22,6 +22,20 @@
     <div class = "wrapper">
 
         <div class = "login-screen" id="logindiv">
+            <div id = "signupModal" class = "modal">
+                <span class="close" onclick="var modal = document.getElementById('signupModal');modal.style.display = 'none';">&times;</span>
+                
+                <div class = "signup-content">
+                    <input type="email" placeholder="| Email" id="signup_email"/>
+                    <br>
+                    <input type="text" placeholder="| Password" id="signup_password"/>
+                    <br>
+                    <button class = "button1" onclick="signup()">Sign Up</button>
+                </div>
+                
+            
+            </div>
+            
             <img src = "assets/yelp_icon.png" width="200" height="200">
 
             <input type="email" placeholder="| Email" id="email_field"/>
@@ -30,7 +44,7 @@
             <br>
             <button class = "button1" onclick="login()">Sign In</button>
 
-            <p>Register now</p>
+            <span onclick="var modal = document.getElementById('signupModal');modal.style.display = 'block';"><p>Register now</p></span>
 
         </div>
 
