@@ -180,7 +180,7 @@ function getData(myurl) {
             
             
         }
-    });  
+    });
 
 }
 
@@ -271,6 +271,7 @@ firebase.auth().onAuthStateChanged(function(user) {
       cProfile = firebase.auth().currentUser;
       
       console.log(user.uid);
+      refreshDisplay();
       refreshFavorites();
 
       document.getElementById("puser").innerHTML = "User : " + user.email + " " + user.uid;
@@ -313,10 +314,124 @@ function refreshFavorites() {
     var ref = database.ref("user/" + cProfile.uid);
     
     ref.once("value", snapshot => {
+        
+        if(snapshot.exists())
+            {
             var key = Object.keys(snapshot.val());
             console.log(key.length);
+
+
+
+            var workspace1 = document.getElementById("favorites-list");
+            workspace1.innerHTML = "";
+
+            for(var i = 0; i < key.length; i++) {
+
+                var myurl = "https://aqueous-shore-68728.herokuapp.com/https://api.yelp.com/v3/businesses/" + key[i];
+
+                $.ajax({
+                url: myurl,
+                headers: {
+                    'Authorization':'Bearer ' + config.BEARER_TOKEN,
+                },
+                method: 'GET',
+                dataType: 'json',
+                success: function(item){
+                    // Grab the results from the API JSON return
+                    console.log(item);
+
+                    //creates workspace out of div called "results" (check html) and clear it
+
+                    //var saving number of results
+
+                    //if total results is greater than zero, create divs for each
+                        //for each result
+
+                            //saving variables from JSON response
+                            var id = item.id;
+                            var name = item.name;
+                            var price = item.price;
+                            var rating = item.rating;
+                            var reviewcount = item.review_count;
+                            var address = item.location.address1;
+                            var city = item.location.city;
+                            var state = item.location.state;
+                            var zipcode = item.location.zip_code;
+                            var lat = item.coordinates.latitude;
+                            var lon = item.coordinates.longitude;
+                            var cat1 = item.categories[0].title;
+
+                            //create a new div for every result (appears as a gray block on app)
+                            var resulttab = document.createElement('div');
+                            resulttab.setAttribute("id",id);
+                            resulttab.setAttribute("class","resultstab");
+
+                            //title for each div
+                            var title = document.createElement('p');
+                            title.setAttribute("class","title");
+                            title.append(name);
+                            resulttab.append(title);
+
+                            //compound description for each div (adds a dot if there is additional content to be added)
+                            var description = document.createElement('p');
+                            description.setAttribute("class","textfill");
+                            if(price != undefined) {
+                                var temp = price;
+                                if(cat1 != undefined) {
+                                    var temp = price + "  \u2022  " + cat1  + "  \u2022  Rating: " + rating + "/5 (" + reviewcount + ")";
+                                }
+                                description.append(temp);
+                                resulttab.append(description);
+                            }
+                            else if(cat1 != undefined) {
+                                description.append(cat1 + "  \u2022  Rating: " + rating + "/5 (" + reviewcount + ")");
+                                resulttab.append(description);
+                            }
+
+                            //address description for each div
+                            var loc = document.createElement('p');
+                            loc.setAttribute("class","textfill");
+                            var temp = address + " " + city + ", " + state + " " + zipcode;
+                            loc.append(temp);
+                            resulttab.append(loc);
+
+                            //location button
+                            let locbtn = document.createElement('button');
+                            locbtn.setAttribute("class","button3");
+                            locbtn.setAttribute("type","submit");
+                            locbtn.innerHTML = 'Directions';
+                            resulttab.append(locbtn);
+
+                            locbtn.onclick = function() {displayMap(lat, lon);}
+
+                            //favorites button
+                            let favbtn = document.createElement('button');
+                            favbtn.setAttribute("class","button4");
+                            favbtn.setAttribute("type","submit");
+                            favbtn.innerHTML = '\u2606';
+                            resulttab.append(favbtn);
+
+                            var refChild = database.ref("user/" + cProfile.uid + "/" + id);
+                                refChild.once("value", snapshot => {
+                                    if(snapshot.exists())
+                                        {
+                                            favbtn.innerHTML = '\u2605';
+                                            favbtn.onclick = function() { unfavorite(favbtn, id);}
+                                        }
+                                    else{
+                                            favbtn.onclick = function() { favorite(favbtn, id);}
+
+                                    }
+
+                            //append entire workspace after every div is made
+                            workspace1.append(resulttab);
+
+                        });
+
+                }
+            });
+    }}
     })
-    
 }
 
 
@@ -337,6 +452,11 @@ function main_menu_favorites() { //hide everything but favorites page
       document.getElementById("favorites-tab").style.display = "block";
       document.getElementById("user-profile").style.display = "none";
       document.getElementById("search-tab").style.display = "none";
+}
+
+function refreshDisplay() {
+    var workspace = document.getElementById("results");
+    var workspace1 = document.getElementById("favorites-list");
 }
 
 function changeBackground(color) {
