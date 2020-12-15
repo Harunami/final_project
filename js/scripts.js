@@ -185,6 +185,14 @@ function getData(myurl) {
 }
 
 function generalSearch() {
+    
+    var workspace = document.getElementById("results");
+    workspace.innerHTML = "";
+    
+    var loader = document.createElement('div');
+    loader.setAttribute("class","loader");
+    workspace.append(loader);
+    
     //get input values from input boxes 'term' and 'location'
     var term = document.getElementById("search_term").value;
     var location = document.getElementById("search_location").value;
@@ -293,7 +301,7 @@ firebase.auth().onAuthStateChanged(function(user) {
       refreshDisplay();
       refreshFavorites();
 
-      document.getElementById("puser").innerHTML = "User : " + user.email + " " + user.uid;
+      document.getElementById("puser").innerHTML = "User : " + user.email;
       display_profile();
       
   } else {
