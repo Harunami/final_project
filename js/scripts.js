@@ -486,6 +486,9 @@ function main_menu_favorites() { //hide everything but favorites page
 function refreshDisplay() {
     var workspace = document.getElementById("results");
     var workspace1 = document.getElementById("favorites-list");
+	
+	workspace.innerHTML = "";
+	workspace1.innerHTML = "";
 }
 
 function changeBackground(color) {
